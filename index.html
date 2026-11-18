@@ -67,8 +67,31 @@ kbd{border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:i
 .controls .mini{border-color:var(--accent)}
 #banner{position:fixed;left:50%;top:64px;transform:translateX(-50%);background:#7f1d1d;color:#fff;padding:16px 22px;border-radius:12px;font-size:clamp(15px,1.6vw,22px);max-width:90vw;box-shadow:0 8px 30px rgba(0,0,0,.5);line-height:1.4;z-index:5}
 #banner.info{background:#78350f}
-#pauseov{position:fixed;inset:0;background:rgba(15,23,42,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:clamp(40px,7vw,110px);font-weight:800;z-index:4}
-#pauseov div{font-size:clamp(16px,2vw,28px);font-weight:400;color:var(--muted);margin-top:12px}
+#pauseov{position:fixed;inset:0;background:rgba(15,23,42,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:clamp(40px,7vw,110px);font-weight:800;z-index:6;padding:16px;text-align:center}
+#pauseov .pmsg{font-size:clamp(15px,2vw,24px);font-weight:400;color:var(--muted);margin-top:10px}
+#pauseov .pbtns{display:flex;flex-direction:column;gap:12px;margin-top:24px;width:min(360px,100%)}
+#pauseov button{font-size:20px;font-weight:700;border-radius:14px;padding:18px 20px;border:1px solid var(--line);background:var(--panel);color:var(--text)}
+#pauseov #bResume{background:var(--go);color:#052e16;border:0;font-size:24px;padding:22px}
+/* Fenêtre arrêter / annuler */
+#stopov{position:fixed;inset:0;background:rgba(15,23,42,.92);display:flex;align-items:center;justify-content:center;z-index:7;padding:16px}
+#stopov .box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;width:min(420px,100%);display:flex;flex-direction:column;gap:12px}
+#stopov h2{margin:0 0 4px;font-size:22px}
+#stopov p{margin:0 0 6px;color:var(--muted);font-size:14px;line-height:1.4}
+#stopov button{font-size:18px;font-weight:600;border-radius:12px;padding:16px;border:1px solid var(--line);background:var(--bg);color:var(--text)}
+#stopov .keep{background:var(--go);color:#052e16;border:0}
+#stopov .cancel{border-color:var(--warn);color:#fecaca}
+/* Bandeau des positions */
+#strip{display:flex;gap:8px;align-items:center;overflow-x:auto;padding:8px 12px;scrollbar-width:none;flex-shrink:0}
+#strip::-webkit-scrollbar{display:none}
+#strip .th{flex:0 0 auto;width:52px;height:52px;background:#fff;border-radius:8px;border:3px solid transparent;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+#strip .th img{max-width:100%;max-height:100%;object-fit:contain}
+#strip .th.cur{width:84px;height:84px;border-color:#3b82f6;box-shadow:0 0 0 2px #3b82f6}
+#strip .th.ok{opacity:.45}
+#strip .th.ok::after{content:"✓";position:absolute;right:2px;bottom:-2px;color:#16a34a;font-weight:800;font-size:18px}
+#strip .th.ko{opacity:.35}
+#strip .sep{flex:0 0 auto;color:var(--muted);font-size:12px;font-weight:600;writing-mode:vertical-rl;transform:rotate(180deg)}
+#awake{font-size:.85em}
+.delrow{background:transparent;border:0;color:var(--muted);font-size:16px;padding:0 4px}
 /* Fin */
 .scale{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 18px}
 .scale button{width:52px;height:52px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:20px}
@@ -96,7 +119,7 @@ kbd{border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:i
 @media (max-width:600px){
   h1{font-size:26px}
   .main{gap:10px;padding:10px 12px}
-  .imgbox{max-height:28vh;padding:6px}
+  .imgbox{max-height:24vh;padding:6px}
   #exname{font-size:28px}
   #target{font-size:18px}
   #side{font-size:20px;margin-top:6px}
@@ -156,7 +179,7 @@ textarea{width:100%;min-height:70px;background:var(--panel);color:var(--text);bo
   </div>
   <p class="note" id="voiceNote"></p>
   <p class="keys">Pendant la séance : boutons en bas de l'écran (Pause, Passer, Recommencer l'exercice). Un exercice impossible faute de matériel : « Passer ».
-  Écran verrouillé ou autre appli ouverte : la séance se met en pause, elle reprend avec « Reprendre ».</p>
+  Écran verrouillé ou autre appli ouverte : la séance se met en pause, elle reprend avec le grand bouton vert « Reprendre ». « Arrêter » (ou le retour d'Android) propose d'enregistrer ou d'annuler la séance. En haut à droite, ☀ = l'écran est maintenu allumé.</p>
 
   <h3>Mouvements</h3>
   <div class="docs">
@@ -181,8 +204,9 @@ textarea{width:100%;min-height:70px;background:var(--panel);color:var(--text);bo
 
 <!-- ============ SÉANCE ============ -->
 <section id="run" class="hidden">
-  <div class="top"><span id="tLeft"></span><span id="tMid"></span><span id="tRight">0:00</span></div>
+  <div class="top"><span id="tLeft"></span><span id="tMid"></span><span><span id="awake"></span> <span id="tRight">0:00</span></span></div>
   <div class="bar"><div id="prog"></div></div>
+  <div id="strip"></div>
   <div class="main" id="mainBox">
     <div class="imgbox"><img id="img" alt=""><div class="ph hidden" id="ph"></div></div>
     <div class="info">
@@ -204,7 +228,19 @@ textarea{width:100%;min-height:70px;background:var(--panel);color:var(--text);bo
     <button id="bKnee" class="warn">Gêne au genou</button>
     <button id="bStop">Arrêter</button>
   </div>
-  <div id="pauseov" class="hidden">PAUSE<div>Bouton « Reprendre » pour continuer</div></div>
+  <div id="pauseov" class="hidden">PAUSE<div class="pmsg" id="pmsg"></div>
+    <div class="pbtns">
+      <button id="bResume">▶ Reprendre</button>
+      <button id="bPauseStop">Arrêter ou annuler la séance…</button>
+    </div>
+  </div>
+  <div id="stopov" class="hidden"><div class="box">
+    <h2>Arrêter la séance ?</h2>
+    <p>« Enregistrer » garde la séance dans le relevé (exercices faits jusqu'ici). « Annuler » l'efface et revient à l'accueil, comme si elle n'avait pas commencé.</p>
+    <button class="keep" id="sContinue">Continuer la séance</button>
+    <button id="sSave">Arrêter et enregistrer</button>
+    <button class="cancel" id="sCancel">Annuler la séance (rien n'est enregistré)</button>
+  </div></div>
 </section>
 <div id="banner" class="hidden"></div>
 
@@ -220,6 +256,7 @@ textarea{width:100%;min-height:70px;background:var(--panel);color:var(--text);bo
   <div class="btns">
     <button class="big" id="sendOne">Valider et envoyer</button>
     <button class="ghost" id="backHome">Plus tard, retour à l'accueil</button>
+    <button class="ghost" id="delLast" style="border-color:var(--warn);color:#fecaca">Supprimer cette séance (essai)</button>
   </div>
   <p class="note" id="sendMsg"></p>
 </section>
@@ -637,6 +674,7 @@ async function runEx(b, g, skipPrep){
   BEEP.end();
   ui({phase:"Terminé", side:""});
   S.rec.ex[b.key] = "fait";
+  snapshot(); updateStrip();
   await wait(800, g);
 }
 
@@ -679,6 +717,38 @@ function topBar(b){
   else mid = `Tour ${b.tour}/${S.maxTour} · exercice ${b.idx}/${b.n}`;
   $("tMid").textContent = mid;
   $("prog").style.width = Math.round(100 * S.cum[S.i] / S.total) + "%";
+  updateStrip();
+}
+/* Bandeau des positions : toutes les positions de la séance, celle en cours plus grande et encadrée en bleu */
+function buildStrip(){
+  const st = $("strip"); st.innerHTML = "";
+  let lastGroup = null;
+  S.plan.forEach((b, j) => {
+    if(b.type !== "ex" || skipped(b)) return;
+    const grp = b.mob ? "Mob." : "T" + b.tour;
+    if(grp !== lastGroup && (S.maxTour > 1 || b.mob)){ const s = document.createElement("span"); s.className = "sep"; s.textContent = grp; st.appendChild(s); }
+    lastGroup = grp;
+    const t = document.createElement("div"); t.className = "th"; t.dataset.j = j;
+    t.innerHTML = `<img src="schemas/${b.d.img}.png" alt="">`;
+    st.appendChild(t);
+  });
+}
+function updateStrip(){
+  const st = $("strip");
+  // position de référence : l'exercice en cours, sinon le prochain
+  let ref = -1;
+  for(let j = S.i; j < S.plan.length; j++){ const b = S.plan[j]; if(b.type === "ex" && !skipped(b)){ ref = j; break; } }
+  let cur = null;
+  [...st.querySelectorAll(".th")].forEach(t => {
+    const j = +t.dataset.j, b = S.plan[j];
+    const hide = skipped(b);
+    t.classList.toggle("hidden", hide);
+    t.classList.toggle("cur", j === ref);
+    t.classList.toggle("ok", S.rec.ex[b.key] === "fait");
+    t.classList.toggle("ko", j < S.i && S.rec.ex[b.key] && S.rec.ex[b.key] !== "fait");
+    if(j === ref) cur = t;
+  });
+  if(cur){ try{ st.scrollTo({left: cur.offsetLeft - (st.clientWidth - cur.offsetWidth) / 2, behavior:"smooth"}); }catch(e){} }
 }
 async function runBlock(b, g, skipPrep){
   S.blockStart = performance.now(); S.inPrep = false; topBar(b);
@@ -707,11 +777,13 @@ async function runFrom(i, skipPrep){
 }
 
 /* ---------------- Commandes ---------------- */
-function togglePause(){
+function togglePause(msg){
   if(!S.running) return;
   S.paused = !S.paused;
-  if(S.paused){ S.pauseAt = performance.now(); if(HAS_TTS) speechSynthesis.cancel(); $("pauseov").classList.remove("hidden"); $("bPause").textContent = "▶ Reprendre"; }
-  else { S.pausedMs += performance.now() - S.pauseAt; $("pauseov").classList.add("hidden"); $("bPause").textContent = "⏸ Pause"; }
+  if(S.paused){ S.pauseAt = performance.now(); if(HAS_TTS) speechSynthesis.cancel();
+    $("pmsg").textContent = typeof msg === "string" ? msg : "";
+    $("pauseov").classList.remove("hidden"); $("bPause").textContent = "▶ Reprendre"; snapshot(); }
+  else { S.pausedMs += performance.now() - S.pauseAt; $("pauseov").classList.add("hidden"); $("bPause").textContent = "⏸ Pause"; keepAwake(); }
 }
 function goNext(){
   if(!S.running) return;
@@ -757,14 +829,43 @@ function minimal(){
   banner(`La séance s'arrête à la fin du tour ${cur}` + (sd.cool || sd.mob ? " (retour au calme et mobilité gardés)." : "."), 6000, "info");
   if(b.type === "rest") runFrom(S.i + 1, false); else topBar(b);
 }
+/* Arrêter : fenêtre à trois choix (continuer, enregistrer, annuler sans rien enregistrer) */
+let stopPausedIt = false;
 function stop(){
   if(!S.running) return;
-  if(!confirm("Arrêter la séance ? Le relevé sera enregistré.")) return;
-  S.gen++; if(HAS_TTS) speechSynthesis.cancel();
-  finish(false);
+  stopPausedIt = !S.paused;
+  if(!S.paused) togglePause();
+  $("pauseov").classList.add("hidden");
+  $("stopov").classList.remove("hidden");
 }
-$("bPause").onclick = togglePause; $("bNext").onclick = goNext; $("bPrev").onclick = goPrev;
+function closeStop(){
+  $("stopov").classList.add("hidden");
+  if(!S.running) return;
+  if(stopPausedIt){ stopPausedIt = false; togglePause(); }
+  else $("pauseov").classList.remove("hidden");
+}
+function cancelRun(){
+  S.gen++; if(HAS_TTS) speechSynthesis.cancel();
+  S.running = false; S.paused = false; clearInterval(clockTimer);
+  try{ localStorage.removeItem(KEY_RUN); }catch(e){}
+  releaseAwake();
+  try{ if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); }catch(e){}
+  ["stopov","pauseov","run","banner","done"].forEach(id => $(id).classList.add("hidden"));
+  $("home").classList.remove("hidden"); renderHome(); window.scrollTo(0, 0);
+}
+$("bPause").onclick = () => togglePause(); $("bNext").onclick = goNext; $("bPrev").onclick = goPrev;
 $("bKnee").onclick = knee; $("bMini").onclick = minimal; $("bStop").onclick = stop;
+$("bResume").onclick = () => { if(S.paused) togglePause(); };
+$("bPauseStop").onclick = stop;
+$("sContinue").onclick = closeStop;
+$("sSave").onclick = () => { $("stopov").classList.add("hidden"); S.gen++; if(HAS_TTS) speechSynthesis.cancel(); finish(false); };
+$("sCancel").onclick = cancelRun;
+/* Retour d'Android pendant la séance : ouvre la fenêtre « Arrêter » au lieu de quitter */
+window.addEventListener("popstate", () => {
+  if(!S.running) return;
+  history.pushState({renfo:"run"}, "");
+  if($("stopov").classList.contains("hidden")) stop(); else closeStop();
+});
 document.addEventListener("keydown", e => {
   if(e.key === "f" || e.key === "F"){ toggleFs(); return; }
   if(!S.running) return;
@@ -773,19 +874,58 @@ document.addEventListener("keydown", e => {
   else if(e.key === "ArrowLeft"){ e.preventDefault(); goPrev(); }
 });
 function toggleFs(){ try{ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }catch(e){} }
-let wakeLock = null;
-async function keepAwake(){ try{ if("wakeLock" in navigator) wakeLock = await navigator.wakeLock.request("screen"); }catch(e){} }
+/* Écran allumé (Wake Lock) : redemandé à chaque reprise, à chaque exercice et dès qu'Android le retire ; ☀ affiché en haut quand il est actif */
+let wakeLock = null, awakeOn = false;
+function showAwake(){
+  const el = $("awake");
+  if(!("wakeLock" in navigator)){ el.textContent = "écran non maintenu"; el.style.color = "#fca5a5"; return; }
+  el.textContent = awakeOn ? "☀" : "☀ ✕"; el.style.color = awakeOn ? "#fde68a" : "#fca5a5";
+  el.title = awakeOn ? "Écran maintenu allumé" : "Écran pas maintenu allumé (mode économie d'énergie ?)";
+}
+async function keepAwake(){
+  if(!("wakeLock" in navigator) || document.visibilityState !== "visible"){ showAwake(); return; }
+  if(wakeLock && !wakeLock.released){ awakeOn = true; showAwake(); return; }
+  try{
+    wakeLock = await navigator.wakeLock.request("screen");
+    awakeOn = true;
+    wakeLock.addEventListener("release", () => { awakeOn = false; showAwake(); if(S.running && document.visibilityState === "visible") setTimeout(keepAwake, 1000); });
+  }catch(e){ awakeOn = false; }
+  showAwake();
+}
+function releaseAwake(){ try{ if(wakeLock) wakeLock.release(); }catch(e){} wakeLock = null; awakeOn = false; }
 document.addEventListener("visibilitychange", () => {
   if(!S.running) return;
   if(document.visibilityState === "hidden"){
-    if(!S.paused) togglePause();
-    S.autoPaused = true;
+    if(!S.paused) togglePause("Mise en pause : écran verrouillé ou autre appli ouverte.");
+    else snapshot();
   } else {
     keepAwake();
-    if(S.autoPaused){ S.autoPaused = false;
-      banner("Séance mise en pause (écran verrouillé ou autre appli). Bouton « Reprendre » pour continuer.", 8000, "info"); }
   }
 });
+/* Séance en cours gardée à chaque exercice : si l'appli est fermée en route, elle revient dans le relevé (« interrompue ») */
+const KEY_RUN = "renfo_seance_en_cours";
+function buildRecord(complete, secs){
+  const exBlocks = S.plan.filter(b => b.type === "ex" && !skipped(b));
+  const faits = exBlocks.filter(b => S.rec.ex[b.key] === "fait").length;
+  const nonFaits = exBlocks.filter(b => S.rec.ex[b.key] !== "fait")
+    .map(b => b.d.spoken + (b.tour ? ` (tour ${b.tour})` : " (mobilité)") + (S.rec.ex[b.key] === "genou" ? " – genou" : ""));
+  return {id:S.rec.id, date:S.rec.date, seance:S.rec.seance, palier:PALIERS_C[S.rec.palier], transition:S.rec.transition,
+    complete, minimal:S.rec.minimal, dureeMin: Math.round(secs/60), faits, total: exBlocks.length,
+    nonFaits, genou: S.rec.genou, douleur: null, ressenti: "", appareil: "telephone", envoye: false};
+}
+function snapshot(){
+  if(!S.running) return;
+  const r = buildRecord(false, clock()); r.interrompue = true;
+  store(KEY_RUN, r);
+}
+function recoverInterrupted(){
+  const r = load(KEY_RUN, null);
+  if(!r) return;
+  try{ localStorage.removeItem(KEY_RUN); }catch(e){}
+  const h = load(KEY_H, []);
+  if(!h.some(x => x.id === r.id)){ h.push(r); store(KEY_H, h); }
+  banner(`Séance interrompue retrouvée (${r.seance}, ${r.faits}/${r.total} exercices) : ajoutée au relevé comme « interrompue ». Supprimable avec ✕ si c'était un essai.`, 10000, "info");
+}
 
 let clockTimer = null;
 function clock(){
@@ -805,9 +945,11 @@ function start(){
     transition: trans, minimal:false, genou:[], ex:{}, douleur:null};
   beep(440, 0.01, 0.01);           // débloque le son (geste de l'utilisateur)
   $("home").classList.add("hidden"); $("done").classList.add("hidden"); $("run").classList.remove("hidden");
-  $("bPause").textContent = "⏸ Pause"; $("pauseov").classList.add("hidden");
-  try{ document.documentElement.requestFullscreen(); }catch(e){}
+  $("bPause").textContent = "⏸ Pause"; $("pauseov").classList.add("hidden"); $("stopov").classList.add("hidden");
+  try{ const p = document.documentElement.requestFullscreen(); if(p && p.catch) p.catch(()=>{}); }catch(e){}
   keepAwake();
+  try{ history.pushState({renfo:"run"}, ""); }catch(e){}
+  buildStrip();
   clearInterval(clockTimer); clockTimer = setInterval(clock, 500);
   runFrom(0, false);
 }
@@ -819,15 +961,12 @@ function finish(complete){
   S.running = false; S.paused = false;
   clearInterval(clockTimer);
   const secs = clock();
-  try{ if(wakeLock) wakeLock.release(); }catch(e){}
-  try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
-  const exBlocks = S.plan.filter(b => b.type === "ex" && !skipped(b));
-  const faits = exBlocks.filter(b => S.rec.ex[b.key] === "fait").length;
-  const nonFaits = exBlocks.filter(b => S.rec.ex[b.key] !== "fait")
-    .map(b => b.d.spoken + (b.tour ? ` (tour ${b.tour})` : " (mobilité)") + (S.rec.ex[b.key] === "genou" ? " – genou" : ""));
-  const r = {id:S.rec.id, date:S.rec.date, seance:S.rec.seance, palier:PALIERS_C[S.rec.palier], transition:S.rec.transition,
-    complete, minimal:S.rec.minimal, dureeMin: Math.round(secs/60), faits, total: exBlocks.length,
-    nonFaits, genou: S.rec.genou, douleur: null, ressenti: "", appareil: "telephone", envoye: false};
+  releaseAwake();
+  try{ localStorage.removeItem(KEY_RUN); }catch(e){}
+  ["pauseov","stopov"].forEach(id => $(id).classList.add("hidden"));
+  try{ if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); }catch(e){}
+  const r = buildRecord(complete, secs);
+  const exBlocks = {length: r.total}, faits = r.faits, nonFaits = r.nonFaits;
   S.last = r;
   $("ressenti").value = ""; $("sendMsg").textContent = "";
   const h = load(KEY_H, []); h.push(r); const ok = store(KEY_H, h);
@@ -853,6 +992,13 @@ function buildScale(){
     sc.appendChild(b);
   }
 }
+function delSeance(id){
+  const h = load(KEY_H, []), r = h.find(x => x.id === id);
+  if(!r) return false;
+  if(!confirm(`Supprimer la séance du ${fmtDate(r.date)} (${r.seance}) du relevé de ce téléphone ?` + (r.envoye ? "\nElle a déjà été envoyée : le fichier dans OneDrive n'est pas effacé." : ""))) return false;
+  store(KEY_H, h.filter(x => x.id !== id)); return true;
+}
+$("delLast").onclick = () => { if(S.last && delSeance(S.last.id)){ $("done").classList.add("hidden"); $("home").classList.remove("hidden"); renderHome(); window.scrollTo(0, 0); } };
 $("backHome").onclick = () => { $("done").classList.add("hidden"); $("home").classList.remove("hidden"); renderHome(); window.scrollTo(0, 0); };
 $("ressenti").oninput = e => {
   const h = load(KEY_H, []); const r = h.find(x => x.id === S.last.id); if(r){ r.ressenti = e.target.value.trim(); store(KEY_H, h); }
@@ -911,10 +1057,11 @@ const minTxt = m => m === true ? "après 1 tour" : (m ? `après ${m} tour${m > 1
 function renderHist(){
   const h = load(KEY_H, []).slice().reverse().slice(0, 20), t = $("hist");
   if(!h.length){ t.innerHTML = "<tr><td class='note'>Aucune séance enregistrée pour l'instant.</td></tr>"; return; }
-  t.innerHTML = "<tr><th>Date</th><th>Séance</th><th>Envoi</th><th>Palier</th><th>Durée</th><th>Faits</th><th>Écourtée</th><th>Genou</th><th>Douleur /10</th></tr>" +
-    h.map(r => `<tr><td>${fmtDate(r.date)}</td><td>${r.seance}${r.complete ? "" : " (arrêtée)"}</td>
+  t.innerHTML = "<tr><th></th><th>Date</th><th>Séance</th><th>Envoi</th><th>Palier</th><th>Durée</th><th>Faits</th><th>Écourtée</th><th>Genou</th><th>Douleur /10</th></tr>" +
+    h.map(r => `<tr><td><button class="delrow" data-id="${r.id}" title="Supprimer">✕</button></td><td>${fmtDate(r.date)}</td><td>${r.seance}${r.complete ? "" : (r.interrompue ? " (interrompue)" : " (arrêtée)")}</td>
       <td>${r.envoye ? "<span class='sent'>envoyée</span>" : "<span class='unsent'>à envoyer</span>"}</td><td>${r.palier}</td><td>${r.dureeMin} min</td>
       <td>${r.faits}/${r.total}</td><td>${minTxt(r.minimal)}</td><td>${r.genou.length ? r.genou.join(", ") : ""}</td><td>${r.douleur ?? ""}</td></tr>`).join("");
+  t.querySelectorAll(".delrow").forEach(b => b.onclick = () => { if(delSeance(+b.dataset.id)) renderHist(); });
   const n = load(KEY_H, []).filter(r => !r.envoye).length;
   $("sendAll").textContent = n ? `Envoyer les séances non envoyées (${n})` : "Toutes les séances sont envoyées";
   $("sendAll").disabled = !n;
@@ -988,10 +1135,11 @@ $("openMoves").onclick = () => { $("home").classList.add("hidden"); $("moves").c
 $("closeMoves").onclick = () => { $("moves").classList.add("hidden"); $("home").classList.remove("hidden"); };
 
 if(!SEANCES[prefs.seance]) prefs.seance = "lundiB";
+recoverInterrupted();
 renderHome();
 
 /* ---------------- Hors connexion (service worker) ---------------- */
-const VERSION_APPLI = "v1";
+const VERSION_APPLI = "v2";
 if("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")){
   navigator.serviceWorker.register("sw.js")
     .then(() => navigator.serviceWorker.ready)
